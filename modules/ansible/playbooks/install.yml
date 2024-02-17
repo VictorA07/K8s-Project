@@ -1,0 +1,12 @@
+---
+ - name:
+   host:
+   become:
+
+   tasks:
+    - name:
+      shell:
+
+    - name:
+      command:
+      

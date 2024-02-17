@@ -1,0 +1,9 @@
+variable "domain-name" {}
+variable "stage-dns-name" {}
+variable "stage-zone-id" {}
+variable "prod-dns-name" {}
+variable "prod-zone-id" {}
+variable "grafana-dns-name" {}
+variable "grafana-zone-id" {}
+variable "prom-dns-name" {}
+variable "prom-zone-id" {}
