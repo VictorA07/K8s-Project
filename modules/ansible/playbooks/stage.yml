@@ -1,0 +1,33 @@
+---
+ - hosts: haproxy1
+   become: true
+   
+   tasks:
+
+    - name: Check if Application Repo exists
+      stat:
+        path: /home/ubuntu/Sock-Shop-App-Demo
+      register: repo_exists
+
+    - name: Clone or Update Application Repo
+      git:
+        repo: https://github.com/VictorA07/Sock-Shop-App-Demo.git
+        dest: /home/ubuntu/Sock-Shop-App-Demo
+      when: not repo_exists.stat.exists
+
+    - name: Updating Application Repo
+      shell:
+        cmd: git pull
+        chdir: /home/ubuntu/Sock-Shop-App-Demo
+      when: repo_exists.stat.exists
+
+    - name: Deleting Previous Deployment to stage-shop
+      shell: sudo su -c "kubectl delete -f staging-complete.yaml" ubuntu
+      ignore_errors: true
+      args:
+        chdir: Sock-Shop-App-Demo/deploy/kubernetes  
+
+    - name: Deploying Latest Features to stage-shop
+      shell: sudo su -c "kubectl apply -f staging-complete.yaml" ubuntu
+      args:
+        chdir: Sock-Shop-App-Demo/deploy/kubernetes
