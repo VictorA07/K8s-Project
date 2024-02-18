@@ -1,6 +1,13 @@
 locals {
-    name = "K8s-servers"
+  name = "K8s-servers"
 
+  prvsub1 = "subnet-0a5ac973a261337cb"
+  prvsub2 = "subnet-03e8268d267dc01b4"
+  prvsub3 = "subnet-092af4c21ca6d0b2a"
+  pubsub1 = "subnet-0648ea27dff5ff3dd"
+  pubsub2 = "subnet-0cb8ed04e0ed78f4f"
+  pubsub3 = "subnet-00d4943cdadb87eb7"
+  vpc-id = "vpc-0f277ffb236495528"
 }
 data "aws_vpc" "vpc" {
   id = local.vpc-id
@@ -80,7 +87,7 @@ module "haproxy" {
   ami           = "ami-0e5f882be1900e43b"
   instance_type = "t2.medium"
   ha-subnet     = data.aws_subnet.prvsub1.id
-  ha-subnet2 = data.aws_subnet.prvsub2.id
+  ha-subnet2    = data.aws_subnet.prvsub2.id
   haproxy-sg    = module.key-sg.kube-sg
   keyname       = module.key-sg.keypair-id
   master1       = module.masternode.masternode-ip[0]
