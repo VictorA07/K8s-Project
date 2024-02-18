@@ -1,0 +1,15 @@
+---
+ - hosts: haproxy1
+   become: true
+   tasks:
+
+    - name: Deleting Previous Deployment to prod-shop
+      shell: sudo su -c "kubectl delete -f prod-complete.yaml" ubuntu
+      ignore_errors: true
+      args:
+        chdir: Sock-Shop-App-Demo/deploy/kubernetes
+
+    - name: Deploying Latest Features to prod-shop
+      shell: sudo su -c "kubectl apply -f prod-complete.yaml" ubuntu 
+      args:
+        chdir:  Sock-Shop-App-Demo/deploy/kubernetes

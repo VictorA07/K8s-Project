@@ -1,10 +1,11 @@
 # Local .terraform directories
 **/.terraform/*
-
+*.DS_Store
+.terraform.*
 # .tfstate files
 *.tfstate
 *.tfstate.*
-
+jenkins-keypair.pem
 # Crash log files
 crash.log
 crash.*.log

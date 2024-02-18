@@ -1,0 +1,9 @@
+variable "grafana-lb-tag" {}
+variable "kube-sg" {}
+variable "kube-subnet" {}
+variable "grafana-tg-tag" {}
+variable "vpc-id" {}
+variable "instance" {}
+variable "certificate_arn" {}
+variable "prom-lb-tag" {}
+variable "prom-tg-tag" {}

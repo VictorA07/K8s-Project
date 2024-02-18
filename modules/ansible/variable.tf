@@ -1,0 +1,16 @@
+variable "ami" {}
+variable "instance_type" {}
+variable "subnet-id" {}
+variable "ansible-sg" {}
+variable "keyname" {}
+variable "private-key" {}
+variable "haproxy1" {}
+variable "haproxy2" {}
+variable "main-master" {}
+variable "main-master01" {}
+variable "main-master02" {}
+variable "worker01" {}
+variable "worker02" {}
+variable "worker03" {}
+variable "server-name" {}
+variable "bastion-host" {}
