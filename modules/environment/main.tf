@@ -75,7 +75,7 @@ resource "aws_lb" "prod-lb" {
 #Creating prod target group
 resource "aws_lb_target_group" "prod-tg" {
   name = var.prod-tg-tag
-  port = 30001
+  port = 30002
   protocol = "HTTP"
   vpc_id = var.vpc-id
 
@@ -91,7 +91,7 @@ resource "aws_lb_target_group" "prod-tg" {
 resource "aws_lb_target_group_attachment" "prod-tg-att" {
   target_group_arn = aws_lb_target_group.prod-tg.arn
   target_id = element(split(",", join(",", "${var.instance}")),count.index)
-  port = 30001
+  port = 30002
   count = 3
 }
 

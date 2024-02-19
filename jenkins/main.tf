@@ -106,7 +106,7 @@ resource "aws_eip" "eip" {
 }
 resource "aws_nat_gateway" "nat-gw" {
   allocation_id = aws_eip.eip.id
-  subnet_id     = aws_subnet.prtsub1.id
+  subnet_id     = aws_subnet.pubsub1.id
   tags = {
     Name = "${local.name}-nat-gw"
   }
@@ -154,7 +154,7 @@ resource "aws_security_group" "jenkins-sg" {
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = -1
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
@@ -170,7 +170,7 @@ resource "tls_private_key" "keypair" {
 resource "local_file" "keypair" {
   content         = tls_private_key.keypair.private_key_pem
   filename        = "jenkins-keypair.pem"
-  file_permission = 600
+  file_permission = "600"
 }
 resource "aws_key_pair" "keypair" {
   key_name   = "jenkins-keypair"
@@ -178,11 +178,11 @@ resource "aws_key_pair" "keypair" {
 }
 
 resource "aws_instance" "jenkins-server" {
-  ami                         = "ami-0e5f882be1900e43b"
+  ami                         = "ami-035cecbff25e0d91e"
   instance_type               = "t2.medium"
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.jenkins-sg.id]
-  subnet_id                   = aws_subnet.prtsub1.id
+  subnet_id                   = aws_subnet.pubsub1.id
   iam_instance_profile        = aws_iam_instance_profile.ec2-profile.id
   key_name                    = aws_key_pair.keypair.id
   user_data                   = local.jenkins-userdata
@@ -198,7 +198,7 @@ resource "aws_iam_instance_profile" "ec2-profile" {
 }
 resource "aws_iam_role" "ec2-role" {
   name               = "ec2-role2"
-  assume_role_policy = file("${path.root}/ec2-assume.json")
+  assume_role_policy = "${file("${path.root}/ec2-assume.json")}"
 }
 resource "aws_iam_role_policy_attachment" "ec2-policy-attachment" {
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"

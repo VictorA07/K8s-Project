@@ -1,13 +1,13 @@
 locals {
   name = "K8s-servers"
 
-  prvsub1 = "subnet-0a5ac973a261337cb"
-  prvsub2 = "subnet-03e8268d267dc01b4"
-  prvsub3 = "subnet-092af4c21ca6d0b2a"
-  pubsub1 = "subnet-0648ea27dff5ff3dd"
-  pubsub2 = "subnet-0cb8ed04e0ed78f4f"
-  pubsub3 = "subnet-00d4943cdadb87eb7"
-  vpc-id = "vpc-0f277ffb236495528"
+  prvsub1 = "subnet-0a1290724408539c5"
+  prvsub2 = "subnet-067ec0192d3d20898"
+  prvsub3 = "subnet-085c351de33810528"
+  pubsub1 = "subnet-078ffdea742e8d77e"
+  pubsub2 = "subnet-0a1e77633e55e3e20"
+  pubsub3 = "subnet-0a7e4491557c6de36"
+  vpc-id = "vpc-0e6d77fcb6506ff4d"
 }
 data "aws_vpc" "vpc" {
   id = local.vpc-id
