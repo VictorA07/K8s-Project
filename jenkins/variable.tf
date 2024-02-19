@@ -1,0 +1,9 @@
+variable "project-name" {}
+variable "availability-zone1" {}
+variable "availability-zone2" {}
+variable "availability-zone3" {}
+variable "ssh-port" {}
+variable "jenkins-port" {}
+variable "instance-type" {}
+variable "iam-policy-arn" {}
+variable "ami-ec2" {}
