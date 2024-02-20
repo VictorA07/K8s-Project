@@ -51,7 +51,7 @@ resource "aws_route53_record" "prom-record" {
 #SSL certificate
 resource "aws_acm_certificate" "ssl-cert" {
   domain_name = data.aws_route53_zone.route53-zone.name
-  subject_alternative_names = ["*.${data.aws_route53_zone.route53.name}"]
+  subject_alternative_names = ["*.${data.aws_route53_zone.route53-zone.name}"]
   validation_method = "DNS"
   lifecycle {
     create_before_destroy = true
@@ -60,10 +60,10 @@ resource "aws_acm_certificate" "ssl-cert" {
 #Creating Route53 validation
 resource "aws_route53_record" "route53-record"{
   for_each = {
-    for dvo in aws_aws_acm_certificate.ssl-cert.domain_validation_options : dvo.domain_name =>{
+    for dvo in aws_acm_certificate.ssl-cert.domain_validation_options : dvo.domain_name =>{
         name = dvo.resource_record_name
-        record = dvo_resource_record_value
-        type = dvo_resource_record_type
+        record = dvo.resource_record_value
+        type = dvo.resource_record_type
     }
   }
   allow_overwrite = true
@@ -76,5 +76,5 @@ resource "aws_route53_record" "route53-record"{
 #SSL validation
 resource "aws_acm_certificate_validation" "ssl-validation" {
   certificate_arn = aws_acm_certificate.ssl-cert.arn
-  validation_record_fqdns = [for record in aws_aws_route53_record.route53-record : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.route53-record : record.fqdn]
 }

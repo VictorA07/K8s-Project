@@ -5,7 +5,7 @@ resource "aws_instance" "ansible-sever" {
   subnet_id = var.subnet-id
   vpc_security_group_ids = var.ansible-sg
   key_name = var.keyname
-  user_data = templatefile("./module/ansible/userdata.sh",{
+  user_data = templatefile("./modules/ansible/userdata.sh",{
     keypair = var.private-key,
     haproxy1 = var.haproxy1,
     haproxy2 = var.haproxy2,

@@ -1,13 +1,7 @@
 locals {
   name = "K8s-servers"
 
-  prvsub1 = "subnet-008d51a3b107c53e2"
-  prvsub2 = "subnet-0c984005384b1fc60"
-  prvsub3 = "subnet-049b0ba65dade27c2"
-  pubsub1 = "subnet-081c9fb6aeeca9cd1"
-  pubsub2 = "subnet-023f73bc834d09321"
-  pubsub3 = "subnet-0d263dae7c0149aee"
-  vpc-id = "vpc-0428501b5a4feb861"
+  
 }
 data "aws_vpc" "vpc" {
   id = local.vpc-id
@@ -102,7 +96,7 @@ module "masternode" {
   ami            = "ami-0e5f882be1900e43b"
   instance-count = "3"
   instance_type  = "t2.medium"
-  master-sg      = [module.key-sg.kube-sg]
+  master-sg      = module.key-sg.kube-sg
   keyname        = module.key-sg.keypair-id
   prvsub-id      = [data.aws_subnet.prvsub1.id, data.aws_subnet.prvsub2.id, data.aws_subnet.prvsub3.id]
   instance-name  = "${local.name}-masternode"
@@ -113,7 +107,7 @@ module "workernode" {
   ami            = "ami-0e5f882be1900e43b"
   instance-count = "3"
   instance_type  = "t2.medium"
-  worker-sg      = [module.key-sg.kube-sg]
+  worker-sg      = module.key-sg.kube-sg
   keyname        = module.key-sg.keypair-id
   prvsub-id      = [data.aws_subnet.prvsub1.id, data.aws_subnet.prvsub2.id, data.aws_subnet.prvsub3.id]
   instance-name  = "${local.name}-workernode"

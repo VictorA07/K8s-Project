@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "bas-ans-ingress" {
 }
 resource "aws_security_group_rule" "bas-ans-egress" {
   security_group_id = aws_security_group.bas-ans-sg.id
-  type = egress
+  type = "egress"
   from_port = 0
   to_port = 0
   protocol = -1
@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "kube-ingress" {
 }
 resource "aws_security_group_rule" "kube-egress" {
   security_group_id = aws_security_group.kube-sg.id
-  type = egress
+  type = "egress"
   from_port = 0
   to_port = 0
   protocol = -1
