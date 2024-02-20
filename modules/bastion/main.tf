@@ -6,10 +6,10 @@ resource "aws_instance" "bastion-server" {
   subnet_id = var.subnet-id
   associate_public_ip_address = true
   key_name = var.keyname
-  user_data = templatefile("./module/bastion/bastion.sh", {
-    private-key = var.private-key
+  user_data = templatefile("./modules/bastion/bastion.sh", {
+      private-key = var.private-key
   })
   tags = {
     Name =   var.server-name
-    }
+  }
 }

@@ -1,7 +1,7 @@
-output "bas-ans-id" {
+output "bas-ans-sg" {
   value = aws_security_group.bas-ans-sg.id
 }
-output "kube-id" {
+output "kube-sg" {
   value = aws_security_group.kube-sg.id
 }
 output "keypair-id" {
