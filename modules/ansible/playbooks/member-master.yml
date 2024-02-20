@@ -26,4 +26,3 @@
           sudo su -c 'mkdir -p $HOME/.kube' ubuntu
           sudo su -c 'sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config' ubuntu
           sudo su -c 'sudo chown $(id -u):$(id -g) $HOME/.kube/config' ubuntu
-          shell:
