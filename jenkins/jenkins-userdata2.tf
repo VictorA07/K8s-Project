@@ -1,5 +1,5 @@
 locals {
-  jenkins-userdata = <<-EOF
+  jenkins-userdata2 = <<-EOF
 #!/bin/bash
 sudo yum update -y
 sudo yum install git -y
@@ -16,7 +16,7 @@ sudo usermod -aG jenkins ec2-user
 sudo hostnamectl set-hostname Jenkins
 
 #Instaling EFS for active jenkins
-#sudo reboot  
+#sudo reboot
 
 # Installing EFS
 sudo yum -y install git rpm-build make
@@ -31,5 +31,11 @@ sudo systemctl stop jenkins
 sudo mount /var/lib/jenkins/jobs
 sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs
 sudo systemctl start jenkins
+
+# add the section to jenkins passive node for concurrrent job updates
+sudo su -c "echo 'crumb_id=$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin) \
+curl -s -XPOST 'http://localhost:8080/reload' -u admin:admin -H "$crumb_id"' >> /opt/jenkins_reload.sh" 
+sudo chmod +x /opt/jenkins_reload.sh
+sudo su -c "echo '*/1 * * * * root /bin/bash /opt/jenkins_reload.sh' >> /etc/cron.d/jenkins_reload"
 EOF  
 }
