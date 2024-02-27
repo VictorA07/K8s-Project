@@ -92,6 +92,13 @@ resource "aws_security_group" "jenkins-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
+    description = "ssh port"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
     description = "jenkins port"
     from_port   = "${var.jenkins-port}"
     to_port     = "${var.jenkins-port}"
@@ -112,13 +119,7 @@ resource "aws_security_group" "efs-sg" {
   description = "efs-security-group"
   name        = "efs-sg"
   vpc_id      = aws_vpc.vpc.id
-  ingress {
-    description = "port"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  
   ingress {
     description = "efs port"
     from_port   = "${var.efs-port}"

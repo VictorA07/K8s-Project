@@ -14,7 +14,6 @@ defaults
   maxconn 2000
   mode http
   option redispatch
-  option forwardfor
   option http-server-close
   retries 3
   timeout http-request 10s
@@ -26,14 +25,17 @@ defaults
 
 frontend ft_jenkins
   bind *:80
+  mode http
+  option httplog
   default_backend bk_jenkins
-  reqadd X-Forwarded-Proto:\ http
   
   
 backend bk_jenkins
+  mode http
+  option httplog
   balance roundrobin
-  server jenkins1 ${aws_instance.jenkins-server-active.private_ip}:8080 check
-  server jenkins2 ${aws_instance.jenkins-server-passive.private_ip}:8080 check
+  server jenkins1 ${aws_instance.jenkins-server-active.private_ip}:8080 check check inter 1000 rise 2 fall 3
+  server jenkins2 ${aws_instance.jenkins-server-passive.private_ip}:8080 check backup inter 1000 rise 2 fall 3
 EOT'
 systemctl start haproxy
 EOF  

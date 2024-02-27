@@ -33,8 +33,8 @@ sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs
 sudo systemctl start jenkins
 
 # add the section to jenkins passive node for concurrrent job updates
-sudo su -c "echo 'crumb_id=$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin) \
-curl -s -XPOST 'http://localhost:8080/reload' -u admin:admin -H "$crumb_id"' >> /opt/jenkins_reload.sh" 
+sudo su -c "echo 'crumb-id=$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin) \
+curl -s -XPOST 'http://localhost:8080/reload' -u admin:admin -H "$crumb-id"' >> /opt/jenkins_reload.sh" 
 sudo chmod +x /opt/jenkins_reload.sh
 sudo su -c "echo '*/1 * * * * root /bin/bash /opt/jenkins_reload.sh' >> /etc/cron.d/jenkins_reload"
 EOF  
