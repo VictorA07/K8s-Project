@@ -1,14 +1,16 @@
 locals {
   name = "K8s-servers"
-
-  prvsub1 = "subnet-0fc31664e3bbdb5c4"
-  prvsub2 = "subnet-082762fcf275761db"
-  prvsub3 = "subnet-039761a577941df2b"
-  pubsub1 = "subnet-08205161b9bf8a0ba"
-  pubsub2 = "subnet-034862f6551977061"
-  pubsub3 = "subnet-052ab180a178da53c"
-  vpc-id = "vpc-04116cd02f00c1344"
   
+  docker-dns = "ec2-18-134-198-197.eu-west-2.compute.amazonaws.com"
+  docker-ip = "18.134.198.197"
+  efs-ip = "fs-0aeef9ea65bbc7c39"
+  prvsub1 = "subnet-03fd64b5578d45937"
+  prvsub2 = "subnet-0b7e2749ad449ef4d"
+  prvsub3 = "subnet-04b5563ab16c1c5b5"
+  pubsub1 = "subnet-08d9ac704cad94006"
+  pubsub2 = "subnet-0bafc6f2d998a5d17"
+  pubsub3 = "subnet-0591a627ba8f78427"
+  vpc-id = "vpc-0fb6e38d8ca639d0d"
 }
 data "aws_vpc" "vpc" {
   id = local.vpc-id

@@ -1,5 +1,5 @@
 locals {
-  jenkins-userdata = <<-EOF
+  jenkins-userdata2 = <<-EOF
 #!/bin/bash
 sudo yum update -y
 sudo yum install git -y
@@ -13,10 +13,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable jenkins
 sudo systemctl start jenkins
 sudo usermod -aG jenkins ec2-user
-sudo hostnamectl set-hostname Jenkins1
+sudo hostnamectl set-hostname Jenkins2
 
 #Instaling EFS for active jenkins
-#sudo reboot  
+#sudo reboot
 
 # Installing EFS
 sudo yum -y install git rpm-build make
@@ -31,5 +31,14 @@ sudo systemctl stop jenkins
 sudo mount /var/lib/jenkins/jobs
 sudo chown -R jenkins:jenkins /var/lib/jenkins/jobs
 sudo systemctl start jenkins
+
+# add the section to jenkins passive node for concurrrent job updates
+# sudo tee /opt/jenkins_reload.sh >/dev/null << EOT
+# #!/bin/bash
+# curl -s -XPOST 'http://localhost:8080/reload' -u admin:11b93da95c141b9395b7da9412b977a879 -H \
+#"$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)"
+# EOT
+# sudo chmod +x /opt/jenkins_reload.sh
+sudo su -c "echo '*/1 * * * * root /bin/bash /opt/jenkins_reload.sh' >> /etc/cron.d/jenkins_reload"
 EOF  
 }

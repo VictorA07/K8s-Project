@@ -40,8 +40,14 @@ resource "aws_lb_listener" "stage-http" {
   port = 80
   protocol = "HTTP"
   default_action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.stage-tg.arn
+    # type = "forward"
+    # target_group_arn = aws_lb_target_group.stage-tg.arn
+    type = "redirect"
+    redirect {
+      port = "443"
+      protocol = "HTTPS"
+      status_code = "HTTPS_301"
+    }
   }
 }
 
@@ -102,8 +108,14 @@ resource "aws_lb_listener" "prod-http" {
   protocol = "HTTP"
 
   default_action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.prod-tg.arn
+    # type = "forward"
+    # target_group_arn = aws_lb_target_group.prod-tg.arn
+    type = "redirect"
+    redirect {
+      port = "443"
+      protocol = "HTTPS"
+      status_code = "HTTPS_301"
+    }
   }
 }
 

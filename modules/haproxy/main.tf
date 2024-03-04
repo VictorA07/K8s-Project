@@ -22,7 +22,7 @@ resource "aws_instance" "haproxy2" {
   subnet_id = var.ha-subnet2
   vpc_security_group_ids = [var.haproxy-sg]
   key_name = var.keyname
-  user_data = templatefile("./modules/haproxy/ha-proxy1.sh", {
+  user_data = templatefile("./modules/haproxy/ha-proxy2.sh", {
     master1 = var.master1
     master2 = var.master2
     master3 = var.master3

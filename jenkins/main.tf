@@ -1,80 +1,44 @@
-locals {
-  name = "${var.project-name}"
-
-}
 resource "aws_vpc" "vpc" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true
   tags = {
-    Name = "${local.name}-vpc"
+    Name = "${var.project-name}-vpc"
   }
 }
 
-resource "aws_subnet" "pubsub1" {
+#creating public subnet
+resource "aws_subnet" "pubsub" {
+  count = 3
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "${var.availability-zone1}"
+  cidr_block        = element(var.public-subnets, count.index)
+  availability_zone = element(var.availability-zones, count.index)
 
   tags = {
-    Name = "${local.name}-pubsub1"
+    Name = "${var.project-name}-pubsub${count.index}"
   }
 }
 
-resource "aws_subnet" "pubsub2" {
+#creating private subnet
+resource "aws_subnet" "prtsub" {
+  count = 3
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "${var.availability-zone2}"
+  cidr_block        = element(var.private-subnets, count.index)
+  availability_zone = element(var.availability-zones, count.index)
 
   tags = {
-    Name = "${local.name}-pubsub2"
+    Name = "${var.project-name}-prtsub${count.index}"
   }
 }
 
-resource "aws_subnet" "pubsub3" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "${var.availability-zone3}"
-
-  tags = {
-    Name = "${local.name}-pubsub3"
-  }
-}
-
-resource "aws_subnet" "prtsub1" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.4.0/24"
-  availability_zone = "${var.availability-zone1}"
-
-  tags = {
-    Name = "${local.name}-prtsub1"
-  }
-}
-
-resource "aws_subnet" "prtsub2" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.5.0/24"
-  availability_zone = "${var.availability-zone2}"
-
-  tags = {
-    Name = "${local.name}-prtsub2"
-  }
-}
-
-resource "aws_subnet" "prtsub3" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.6.0/24"
-  availability_zone = "${var.availability-zone3}"
-
-  tags = {
-    Name = "${local.name}-prtsub3"
-  }
-}
+#creating internet gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "${local.name}-igw"
+    Name = "${var.project-name}-igw"
   }
 }
 
+#creating route table
 resource "aws_route_table" "pubrt" {
   vpc_id = aws_vpc.vpc.id
   route {
@@ -82,33 +46,27 @@ resource "aws_route_table" "pubrt" {
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
-    Name : "${local.name}-pubrt"
+    Name : "${var.project-name}-pubrt"
   }
 }
 
-resource "aws_route_table_association" "pubrt-ass-1" {
+resource "aws_route_table_association" "pubrt-ass" {
+  count = 3
   route_table_id = aws_route_table.pubrt.id
-  subnet_id      = aws_subnet.pubsub1.id
+  subnet_id      = aws_subnet.pubsub[count.index].id
 }
-resource "aws_route_table_association" "pubrt-ass-2" {
-  route_table_id = aws_route_table.pubrt.id
-  subnet_id      = aws_subnet.pubsub2.id
-}
-resource "aws_route_table_association" "pubrt-ass-3" {
-  route_table_id = aws_route_table.pubrt.id
-  subnet_id      = aws_subnet.pubsub3.id
-}
+
 resource "aws_eip" "eip" {
   domain = "vpc"
   tags = {
-    Name = "${local.name}-eip"
+    Name = "${var.project-name}-eip"
   }
 }
 resource "aws_nat_gateway" "nat-gw" {
   allocation_id = aws_eip.eip.id
-  subnet_id     = aws_subnet.pubsub1.id
+  subnet_id     = aws_subnet.pubsub[0].id
   tags = {
-    Name = "${local.name}-nat-gw"
+    Name = "${var.project-name}-nat-gw"
   }
 }
 resource "aws_route_table" "prvrt" {
@@ -118,21 +76,16 @@ resource "aws_route_table" "prvrt" {
     nat_gateway_id = aws_nat_gateway.nat-gw.id
   }
   tags = {
-    Name = "${local.name}-prvrt"
+    Name = "${var.project-name}-prvrt"
   }
 }
-resource "aws_route_table_association" "prvrt-ass-1" {
+resource "aws_route_table_association" "prvrt-ass" {
+  count = 3
   route_table_id = aws_route_table.prvrt.id
-  subnet_id      = aws_subnet.prtsub1.id
+  subnet_id      = aws_subnet.prtsub[count.index].id
 }
-resource "aws_route_table_association" "prvrt-ass-2" {
-  route_table_id = aws_route_table.prvrt.id
-  subnet_id      = aws_subnet.prtsub2.id
-}
-resource "aws_route_table_association" "prvrt-ass-3" {
-  route_table_id = aws_route_table.prvrt.id
-  subnet_id      = aws_subnet.prtsub3.id
-}
+
+#Creating  Security Group
 resource "aws_security_group" "jenkins-sg" {
   description = "jenkins-security-group"
   name        = "jenkins"
@@ -141,6 +94,13 @@ resource "aws_security_group" "jenkins-sg" {
     description = "ssh port"
     from_port   = "${var.ssh-port}"
     to_port     = "${var.ssh-port}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "ssh port"
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -158,10 +118,74 @@ resource "aws_security_group" "jenkins-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "${local.name}-jenkins-sg"
+    Name = "${var.project-name}-jenkins-sg"
+  }
+}
+resource "aws_security_group" "efs-sg" {
+  description = "efs-security-group"
+  name        = "efs-sg"
+  vpc_id      = aws_vpc.vpc.id
+  
+  ingress {
+    description = "efs port"
+    from_port   = "${var.efs-port}"
+    to_port     = "${var.efs-port}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id]
+  }
+  tags = {
+    Name = "${var.project-name}-efs-sg"
   }
 }
 
+resource "aws_security_group" "docker-sg" {
+  description = "docker-security-group"
+  name        = "docker-sg"
+  vpc_id      = aws_vpc.vpc.id
+  ingress {
+    description = "ssh port"
+    from_port   = "${var.ssh-port}"
+    to_port     = "${var.ssh-port}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "docker port"
+    from_port   = 4243
+    to_port     = 4243
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id, aws_security_group.efs-sg.id]
+  }
+  ingress {
+    description = "docker port"
+    from_port   = 32768
+    to_port     = 60999
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id, aws_security_group.efs-sg.id]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id, aws_security_group.efs-sg.id]
+  }
+  tags = {
+    Name = "${var.project-name}-docker-sg"
+  }
+}
+
+#Creating Keypair 
 resource "tls_private_key" "keypair" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -177,21 +201,87 @@ resource "aws_key_pair" "keypair" {
   public_key = tls_private_key.keypair.public_key_openssh
 }
 
-resource "aws_instance" "jenkins-server" {
+#Creating EFS
+resource "aws_efs_file_system" "jenkins-efs" {
+  creation_token = "jenkins-backup"
+  performance_mode = "generalPurpose"
+  throughput_mode = "bursting"
+  lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  tags = {
+    Name = "jenkins-backup"
+  }
+}
+resource "aws_efs_mount_target" "jenkins-mtg" {
+  count = 2
+  file_system_id = aws_efs_file_system.jenkins-efs.id
+  subnet_id      = element(aws_subnet.pubsub[*].id, count.index)  #Change to VPC module if it does not work
+  security_groups = [aws_security_group.efs-sg.id]
+}
+
+#Creating Servers
+resource "aws_instance" "jenkins-server-active" {
   ami                         = "${var.ami-ec2}"
   instance_type               = "${var.instance-type}"
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.jenkins-sg.id]
-  subnet_id                   = aws_subnet.pubsub1.id
+  subnet_id                   = aws_subnet.pubsub[0].id
   iam_instance_profile        = aws_iam_instance_profile.ec2-profile.id
   key_name                    = aws_key_pair.keypair.id
   user_data                   = local.jenkins-userdata
 
   tags = {
-    Name = "${local.name}-jenkins-server"
+    Name = "${var.project-name}-jenkins-server-active"
+  }
+  depends_on = [ aws_efs_mount_target.jenkins-mtg ]
+}
+
+resource "aws_instance" "jenkins-server-passive" {
+  ami                         = "${var.ami-ec2}"
+  instance_type               = "${var.instance-type}"
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.jenkins-sg.id]
+  subnet_id                   = aws_subnet.pubsub[1].id
+  iam_instance_profile        = aws_iam_instance_profile.ec2-profile.id
+  key_name                    = aws_key_pair.keypair.id
+  user_data                   = local.jenkins-userdata2
+
+  tags = {
+    Name = "${var.project-name}-jenkins-server-passive"
+  }
+  depends_on = [ aws_efs_mount_target.jenkins-mtg ]
+}
+resource "aws_instance" "haproxy-server" {
+  ami                         = "${var.ami-ubuntu}"
+  instance_type               = "${var.instance-type}"
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.jenkins-sg.id]
+  subnet_id                   = aws_subnet.pubsub[2].id
+  iam_instance_profile        = aws_iam_instance_profile.ec2-profile.id
+  key_name                    = aws_key_pair.keypair.id
+  user_data                   = local.haproxy-data
+
+  tags = {
+    Name = "${var.project-name}-haproxy-server"
+  }
+}
+resource "aws_instance" "docker-server" {
+  ami                         = "${var.ami-ubuntu}"
+  instance_type               = "${var.instance-type}"
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.docker-sg.id]
+  subnet_id                   = aws_subnet.pubsub[0].id
+  iam_instance_profile        = aws_iam_instance_profile.ec2-profile.id
+  key_name                    = aws_key_pair.keypair.id
+  user_data                   = local.docker-userdata
+
+  tags = {
+    Name = "${var.project-name}-docker-server"
   }
 }
 
+#Creatng Iam profile
 resource "aws_iam_instance_profile" "ec2-profile" {
   name = "ec2-profile2"
   role = aws_iam_role.ec2-role.name
@@ -205,8 +295,9 @@ resource "aws_iam_role_policy_attachment" "ec2-policy-attachment" {
   role       = aws_iam_role.ec2-role.name
 }
 
+#Creating Null resource to write terraform output to Main.tf file
 resource "null_resource" "credentials" {
-  depends_on = [aws_instance.jenkins-server]
+  depends_on = [aws_instance.jenkins-server-active]
   provisioner "local-exec" {
     command = <<-EOT
       ids_output=$(terraform output)

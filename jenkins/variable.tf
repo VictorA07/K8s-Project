@@ -1,9 +1,11 @@
 variable "project-name" {}
-variable "availability-zone1" {}
-variable "availability-zone2" {}
-variable "availability-zone3" {}
+variable "availability-zones" {}
+variable "public-subnets" {}
+variable "private-subnets" {}
 variable "ssh-port" {}
 variable "jenkins-port" {}
 variable "instance-type" {}
 variable "iam-policy-arn" {}
 variable "ami-ec2" {}
+variable "ami-ubuntu" {}
+variable "efs-port" {}

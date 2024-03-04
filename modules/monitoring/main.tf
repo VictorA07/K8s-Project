@@ -43,8 +43,14 @@ resource "aws_lb_listener" "grafana-http" {
   protocol = "HTTP"
 
   default_action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.grafana-tg.arn
+    # type = "forward"
+    # target_group_arn = aws_lb_target_group.grafana-tg.arn
+    type = "redirect"
+    redirect {
+      port = "443"
+      protocol = "HTTPS"
+      status_code = "HTTPS_301"
+    }
   }
 }
 
@@ -107,8 +113,14 @@ resource "aws_lb_listener" "prom-http" {
   protocol = "HTTP"
 
   default_action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.prom-tg.arn
+    # type = "forward"
+    # target_group_arn = aws_lb_target_group.prom-tg.arn
+    type = "redirect"
+    redirect {
+      port = "443"
+      protocol = "HTTPS"
+      status_code = "HTTPS_301"
+    }
   }
 }
 
