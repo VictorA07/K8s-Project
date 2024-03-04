@@ -47,8 +47,10 @@ To deploythis code successfully, kindly follow the below instructions.
 
 # Section 1: Jenkins Deployment
 ## Step 1: Git repository cloning
-You can clone the repositoryusing the commmans below.
-```git clone https://github.com/VictorA07/K8s-Project.git``` and navigate to the project directory
+You can clone the repositoryusing the commmans below and navigate to the project directory.
+```
+git clone https://github.com/VictorA07/K8s-Project.git
+``` 
 
 ## Step 2: Settings your credentials
 Create and update this **variable.tfvars** below.
@@ -70,16 +72,24 @@ jenkins-port = 8080
 # Step 3: Initialize Terraform and Deploying resources
 Run the command to initialize Terraform and deploy our jenkins resources.
 ### To initialize
-```terraform init -var-file=variable.tfvars -lock=false```
+```
+terraform init -var-file=variable.tfvars -lock=false
+```
 
 ### To plan the deployment
-```terraform plan -var-file=variable.tfvars -lock=false```
+```
+terraform plan -var-file=variable.tfvars -lock=false
+```
 
 ### To deploy
-```terraform apply -var-file=variable.tfvars -lock=false -auto-approve```
+```
+terraform apply -var-file=variable.tfvars -lock=false -auto-approve
+```
 
 ### To destroy
-```terraform destroy -var-file=variable.tfvars -lock=false -auto-approve```
+```
+terraform destroy -var-file=variable.tfvars -lock=false -auto-approve
+```
 
 Some of the resources out needed in our application infrastructure main.tf will be populated. This is performedby a null resource block added to the jenkins infrastructure main.tf file.
 
@@ -100,11 +110,30 @@ resource "null_resource" "credentials" {
 ## Step 1: Jenkins setup
 SSH in to your Jenkins server and set upthe following on both master and backup sever.
 Required plugins - Terraform, AWS Credentials
-Required credentials - AWS credentials (by adding our aws access key and id) and git credentials using username and password(git token)
+Required credentials - AWS credentials (by adding our aws access key and id)
+    - git credentials using username and password(git token)
+    - Jenkins ssh credentials - creating ssh credentials user- ec2-user and add your jenkins primary keypair
+    -Jenkins credentials - using username(jenkins) and password(password)
 Tools - Under Terraform - name- teraform, check Instal automatically, Type -linux amd64 
 Under Admin - Configuration, Create an API token.
 Use the token to create a webhook on your Github. paste the api token to the secret box below.
 ![alt text](<Screenshot 2024-03-04 at 14.04.45.png>)
+
+To setup jenkins-slave on docker;
+Click on manage jenkins - Cloud - give it a name(e.g jenkins-slave)  - check Docker
+follow the picture below for setup
+![alt text](<Screenshot 2024-03-02 at 21.38.40.png>)
+![alt text](<Screenshot 2024-03-02 at 21.38.49.png>)
+![alt text](<Screenshot 2024-03-02 at 21.39.25.png>)
+![alt text](<Screenshot 2024-03-02 at 21.39.32.png>)
+![alt text](<Screenshot 2024-03-02 at 21.39.42.png>)
+
+In your pipeline, you can asssign the job to the slave to run the job
+```
+any {
+    label "jenkins-slave"
+}
+```
 
 ## Pipeline setup
 Create new item  or job
