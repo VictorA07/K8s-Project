@@ -5,7 +5,6 @@ sudo apt-get update -y
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt-get install ansible python3-pip -y
-sudo bash -c ' echo "strictHostKeyChecking No" >> /etc/ssh/ssh_config'
 
 # copy keypair from local machine to ansible server
 echo "${keypair}" > /home/ubuntu/.ssh/id_rsa
@@ -13,6 +12,9 @@ sudo chmod 400 /home/ubuntu/.ssh/id_rsa
 sudo chown ubuntu:ubuntu /home/ubuntu/.ssh/id_rsa
 
 # Give right permissions to the ansible directory
+sudo touch /etc/ansible/hosts
+sudo chown ubuntu:ubuntu /etc/ansible/hosts
+sudo chown -R ubuntu:ubuntu /etc/ansible && chmod +x /etc/ansible
 sudo chown -R ubuntu:ubuntu /etc/ansible
 sudo chmod 777 /etc/ansible/hosts
 
@@ -21,8 +23,8 @@ sudo echo HAPROXY1: "${haproxy1}" > /home/ubuntu/ha-ip.yml
 sudo echo HAPROXY2: "${haproxy2}" >> /home/ubuntu/ha-ip.yml
 
 # Update the host inventory file with all our IPs
-# echo "[all:vars]" > /etc/ansible/hosts
-# echo "ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'" >> /etc/ansible/hosts
+echo "[all:vars]" > /etc/ansible/hosts
+echo "ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'" >> /etc/ansible/hosts
 sudo echo "[haproxy1]" > /etc/ansible/hosts
 sudo echo "${haproxy1} ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa >> /etc/ansible/hosts
 sudo echo "[haproxy2]" >> /etc/ansible/hosts
