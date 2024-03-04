@@ -21,8 +21,8 @@ sudo echo HAPROXY1: "${haproxy1}" > /home/ubuntu/ha-ip.yml
 sudo echo HAPROXY2: "${haproxy2}" >> /home/ubuntu/ha-ip.yml
 
 # Update the host inventory file with all our IPs
-echo "[all:vars]" > /etc/ansible/hosts
-echo "ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'" >> /etc/ansible/hosts
+# echo "[all:vars]" > /etc/ansible/hosts
+# echo "ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'" >> /etc/ansible/hosts
 sudo echo "[haproxy1]" > /etc/ansible/hosts
 sudo echo "${haproxy1} ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa >> /etc/ansible/hosts
 sudo echo "[haproxy2]" >> /etc/ansible/hosts
