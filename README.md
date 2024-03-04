@@ -1,13 +1,14 @@
 # Project Name - Kubernetes Project with Multi-Jenkins CICD
 ## Introduction
-This project involve creating a highly available, highly scalable microservice application using multi-master kubernetes and master-slave jenkins with a failover strategy.
+This project involves creating a highly available, highly scalable microservice application using multi-master Kubernetes and master-slave Jenkins with a failover strategy.
 
-This is a kubernetes project using Kubeadm and using Terraform as IAC (Infastructure as Code) to build the infastructure. This repository includes all terrraform code. The README file will gives step by step guide on how to deploy this project.
+This is a Kubernetes project using Kubeadm and Terraform as IAC (Infrastructure as Code) to build the infrastructure. 
+This repository includes all terraform code. The README file will give step by step guide on how to deploy this project.
 
 ## Tech Stack
 Infastructure as code (IAC) - Terraform
 Cloud infrastructure - AWS Cloud Services
-Version Control System - Github
+Version Control System - GitHub
 Configuration Management - Ansible
 Endpoint to cluster and Jenkins master-master lb- Haproxy
 CICD Tool: Jenkins
@@ -23,31 +24,33 @@ An AWS account - You'll need an active AWS account to deploy resources using thi
 AWS CLI - Install the AWS Command Line Interface (CLI) on your local machine and configure it with your AWS credentials.
 Terraform - Install Terraform on your local machine.
 Git - Install Git on your local machine to clone this repository.
-Create a AWS hosted zone on your AWS account and configure the dns with your domain name
+Create a AWS hosted zone on your AWS account and configure the DNS with your domain name
 
 ## Application Breakdown
-This project aims at satisfying client requirement in creating a highly avaialable, scalable micro service application.
-The infastructure was built using Terraform blocks Blocks in Terraform Provider Block, Data Block, Resource Block, Module Block, Variable Block, Output Block, Locals Block.
-We only provision all servers related to Jenkins on our local machine and the code is been pushed to the github repo.
+This project aims to satisfy client requirements by creating a highly available, scalable microservice application.
+The infrastructure was built using Terraform blocks Blocks in Terraform Provider Block, Data Block, Resource Block, Module Block, Variable Block, Output Block, and Locals Block.
+We only provision all servers related to Jenkins on our local machine and the code is been pushed to the GitHub repo.
 
-## Continous Intergration and Continous Delivery (CICD) process
-Jenkins was used in provisioning our application infastructure to enhance continuous integration with a webhook triger connected to our infastructure github repository for continuous dilevery of any enhancement.
+## Continous Integration and Continous Delivery (CICD) process
+Jenkins was used in provisioning our application infrastructure to enhance continuous integration with a webhook trigger connected to our infrastructure GitHub repository for continuous delivery of any enhancement.
 ### Jenkins architecture
-We create two master jenkins with same configuration. One as main-master and the other as master-backup  to serve as failover for the Jenkins master. We mount an Elastic File System (EFS) on both sever pointing to same direcctory. We used Haproxy with port binding 80 to direct traffic to the backup serverif the main master is dowm.
-For frequent update of jobs run on the main master, we use the code below whose functiion is to reloadand update the backup server.
+We create two master Jenkins with the same configuration. One as the main-master and the other is master-backup  to serve as a failover for the Jenkins master. 
+We mount an Elastic File System (EFS) on both server pointing to the same directory. 
+We used Haproxy with port binding 80 to direct traffic to the backup server if the main master is down.
+For frequent updates of jobs run on the main master, we used the code below whose function is to reload and update the backup server.
 ```
 curl -s -XPOST 'http://localhost:8080/reload' -u admin:11b93da95c141b9395b7da9412b977a879 -H "$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)"
 
 ```
-We generate an API token from the backup sever, then use `$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)` to generate jenkins crumb id from the backup sever. The admin:admin signify the username and passowrd while `admin:11b93da95c141b9395b7da9412b977a879` signify the username and api token respectively.
-Also as part of resource managemnt, we created a docker server for the purpose of creating jenkins-slaves to run jenkins jobs. each container is killed once a job is completed.
+We generate an API token from the backup server, then use `$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)` to generate jenkins crumb id from the backup server. The admin: admin signifies the username and password while `admin:11b93da95c141b9395b7da9412b977a879` signifies the username and API token respectively.
+Also as part of resource management, we created a docker server to create jenkins-slaves to run Jenkins jobs. each container is killed once a job is completed.
 
 # Code Deployment
-To deploythis code successfully, kindly follow the below instructions.
+To deploy this code successfully, kindly follow the below instructions.
 
 # Section 1: Jenkins Deployment
 ## Step 1: Git repository cloning
-You can clone the repositoryusing the commmans below and navigate to the project directory.
+You can clone the repository using the command below and navigate to the project directory.
 ```
 git clone https://github.com/VictorA07/K8s-Project.git
 ``` 
@@ -70,7 +73,7 @@ ssh-port = 22
 jenkins-port = 8080
 ```
 # Step 3: Initialize Terraform and Deploying resources
-Run the command to initialize Terraform and deploy our jenkins resources.
+Run the command to initialize Terraform and deploy our Jenkins resources.
 ### To initialize
 ```
 terraform init -var-file=variable.tfvars -lock=false
@@ -81,17 +84,17 @@ terraform init -var-file=variable.tfvars -lock=false
 terraform plan -var-file=variable.tfvars -lock=false
 ```
 
-### To deploy
+### To Deploy
 ```
 terraform apply -var-file=variable.tfvars -lock=false -auto-approve
 ```
 
-### To destroy
+### To Destroy
 ```
 terraform destroy -var-file=variable.tfvars -lock=false -auto-approve
 ```
 
-Some of the resources out needed in our application infrastructure main.tf will be populated. This is performedby a null resource block added to the jenkins infrastructure main.tf file.
+Some of the resources out needed in our application infrastructure main.tf will be populated. This is performed by a null resource block added to the Jenkins infrastructure main.tf file.
 
 ```
 resource "null_resource" "credentials" {
@@ -105,18 +108,18 @@ resource "null_resource" "credentials" {
 }
 ```
 
-# Section 2: Infastructure and Application deployment using Jenkins.
+# Section 2: Infrastructure and Application deployment using Jenkins.
 
 ## Step 1: Jenkins setup
-SSH in to your Jenkins server and set upthe following on both master and backup sever.
+SSH into your Jenkins server and set up the following on both master and backup servers.
 Required plugins - Terraform, AWS Credentials
-Required credentials - AWS credentials (by adding our aws access key and id)
+Required credentials - AWS credentials (by adding our AWS access key and ID)
     - git credentials using username and password(git token)
     - Jenkins ssh credentials - creating ssh credentials user- ec2-user and add your jenkins primary keypair
-    -Jenkins credentials - using username(jenkins) and password(password)
-Tools - Under Terraform - name- teraform, check Instal automatically, Type -linux amd64 
+    -Jenkins credentials - using username(Jenkins) and password(password)
+Tools - Under Terraform - name- terraform, check Instal automatically, Type -linux amd64 
 Under Admin - Configuration, Create an API token.
-Use the token to create a webhook on your Github. paste the api token to the secret box below.
+Use the token to create a webhook on your Github. paste the API token to the secret box below.
 ![alt text](<Screenshot 2024-03-04 at 14.04.45.png>)
 
 To setup jenkins-slave on docker;
@@ -128,7 +131,7 @@ follow the picture below for setup
 ![alt text](<Screenshot 2024-03-02 at 21.39.32.png>)
 ![alt text](<Screenshot 2024-03-02 at 21.39.42.png>)
 
-In your pipeline, you can asssign the job to the slave to run the job
+In your pipeline, you can assign the job to the slave to run the job
 ```
 any {
     label "jenkins-slave"
@@ -136,16 +139,16 @@ any {
 ```
 
 ## Pipeline setup
-Create new item  or job
+Create a new item  or job
 Select choice parameter
 name= action
 Choices = apply, destroy
 
 choose github trigger
 Add your github repository link
-In your build, You can perform a terraform apply by chosing apply and terraform destroy by chosing destroy.
-You can use your domain name with specifiedprefix to access your application.
+In your build, You can perform a terraform apply by choosing to apply and terraform destroy by choosing to destroy.
+You can use your domain name with a specified prefix to access your application.
 
 
-Kinly reach out for more information and feedback. 
+Kindly reach out for more information and feedback. 
 Thank you.
