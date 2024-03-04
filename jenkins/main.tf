@@ -6,6 +6,7 @@ resource "aws_vpc" "vpc" {
   }
 }
 
+#creating public subnet
 resource "aws_subnet" "pubsub" {
   count = 3
   vpc_id            = aws_vpc.vpc.id
@@ -16,6 +17,8 @@ resource "aws_subnet" "pubsub" {
     Name = "${var.project-name}-pubsub${count.index}"
   }
 }
+
+#creating private subnet
 resource "aws_subnet" "prtsub" {
   count = 3
   vpc_id            = aws_vpc.vpc.id
@@ -27,6 +30,7 @@ resource "aws_subnet" "prtsub" {
   }
 }
 
+#creating internet gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
   tags = {
@@ -34,6 +38,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+#creating route table
 resource "aws_route_table" "pubrt" {
   vpc_id = aws_vpc.vpc.id
   route {
@@ -80,6 +85,7 @@ resource "aws_route_table_association" "prvrt-ass" {
   subnet_id      = aws_subnet.prtsub[count.index].id
 }
 
+#Creating  Security Group
 resource "aws_security_group" "jenkins-sg" {
   description = "jenkins-security-group"
   name        = "jenkins"
@@ -136,10 +142,50 @@ resource "aws_security_group" "efs-sg" {
     security_groups = [aws_security_group.jenkins-sg.id]
   }
   tags = {
-    Name = "${var.project-name}-jenkins-sg"
+    Name = "${var.project-name}-efs-sg"
   }
 }
 
+resource "aws_security_group" "docker-sg" {
+  description = "docker-security-group"
+  name        = "docker-sg"
+  vpc_id      = aws_vpc.vpc.id
+  ingress {
+    description = "ssh port"
+    from_port   = "${var.ssh-port}"
+    to_port     = "${var.ssh-port}"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "docker port"
+    from_port   = 4243
+    to_port     = 4243
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id, aws_security_group.efs-sg.id]
+  }
+  ingress {
+    description = "docker port"
+    from_port   = 32768
+    to_port     = 60999
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id, aws_security_group.efs-sg.id]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.jenkins-sg.id, aws_security_group.efs-sg.id]
+  }
+  tags = {
+    Name = "${var.project-name}-docker-sg"
+  }
+}
+
+#Creating Keypair 
 resource "tls_private_key" "keypair" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -154,6 +200,8 @@ resource "aws_key_pair" "keypair" {
   key_name   = "jenkins-keypair"
   public_key = tls_private_key.keypair.public_key_openssh
 }
+
+#Creating EFS
 resource "aws_efs_file_system" "jenkins-efs" {
   creation_token = "jenkins-backup"
   performance_mode = "generalPurpose"
@@ -172,6 +220,7 @@ resource "aws_efs_mount_target" "jenkins-mtg" {
   security_groups = [aws_security_group.efs-sg.id]
 }
 
+#Creating Servers
 resource "aws_instance" "jenkins-server-active" {
   ami                         = "${var.ami-ec2}"
   instance_type               = "${var.instance-type}"
@@ -217,7 +266,22 @@ resource "aws_instance" "haproxy-server" {
     Name = "${var.project-name}-haproxy-server"
   }
 }
+resource "aws_instance" "docker-server" {
+  ami                         = "${var.ami-ubuntu}"
+  instance_type               = "${var.instance-type}"
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.docker-sg.id]
+  subnet_id                   = aws_subnet.pubsub[0].id
+  iam_instance_profile        = aws_iam_instance_profile.ec2-profile.id
+  key_name                    = aws_key_pair.keypair.id
+  user_data                   = local.docker-userdata
 
+  tags = {
+    Name = "${var.project-name}-docker-server"
+  }
+}
+
+#Creatng Iam profile
 resource "aws_iam_instance_profile" "ec2-profile" {
   name = "ec2-profile2"
   role = aws_iam_role.ec2-role.name
@@ -231,6 +295,7 @@ resource "aws_iam_role_policy_attachment" "ec2-policy-attachment" {
   role       = aws_iam_role.ec2-role.name
 }
 
+#Creating Null resource to write terraform output to Main.tf file
 resource "null_resource" "credentials" {
   depends_on = [aws_instance.jenkins-server-active]
   provisioner "local-exec" {

@@ -31,3 +31,9 @@ output "haproxy-ip" {
 output "efs-ip" {
   value = aws_efs_file_system.jenkins-efs.id
 }
+output "docker-ip" {
+  value = aws_instance.docker-server.public_ip
+}
+output "docker-dns" {
+  value = aws_instance.docker-server.public_dns
+}

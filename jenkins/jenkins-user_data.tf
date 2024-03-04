@@ -13,7 +13,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable jenkins
 sudo systemctl start jenkins
 sudo usermod -aG jenkins ec2-user
-sudo hostnamectl set-hostname Jenkins
+sudo hostnamectl set-hostname Jenkins1
 
 #Instaling EFS for active jenkins
 #sudo reboot  
