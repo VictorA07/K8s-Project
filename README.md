@@ -1,4 +1,6 @@
 # Project Name - Kubernetes Project with Multi-Jenkins CICD
+Project architectural diagram
+![alt text](Kube-prj.jpg)
 ## Introduction
 This project involves creating a highly available, highly scalable microservice application using multi-master Kubernetes and master-slave Jenkins with a failover strategy.
 
