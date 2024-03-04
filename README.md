@@ -35,7 +35,10 @@ Jenkins was used in provisioning our application infastructure to enhance contin
 ### Jenkins architecture
 We create two master jenkins with same configuration. One as main-master and the other as master-backup  to serve as failover for the Jenkins master. We mount an Elastic File System (EFS) on both sever pointing to same direcctory. We used Haproxy with port binding 80 to direct traffic to the backup serverif the main master is dowm.
 For frequent update of jobs run on the main master, we use the code below whose functiion is to reloadand update the backup server.
-`curl -s -XPOST 'http://localhost:8080/reload' -u admin:11b93da95c141b9395b7da9412b977a879 -H "$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)"`
+```
+curl -s -XPOST 'http://localhost:8080/reload' -u admin:11b93da95c141b9395b7da9412b977a879 -H "$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)"
+
+```
 We generate an API token from the backup sever, then use `$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)` to generate jenkins crumb id from the backup sever. The admin:admin signify the username and passowrd while `admin:11b93da95c141b9395b7da9412b977a879` signify the username and api token respectively.
 Also as part of resource managemnt, we created a docker server for the purpose of creating jenkins-slaves to run jenkins jobs. each container is killed once a job is completed.
 
