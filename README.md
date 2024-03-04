@@ -33,16 +33,22 @@ We only provision all servers related to Jenkins on our local machine and the co
 
 ## Continous Integration and Continous Delivery (CICD) process
 Jenkins was used in provisioning our application infrastructure to enhance continuous integration with a webhook trigger connected to our infrastructure GitHub repository for continuous delivery of any enhancement.
+
 ### Jenkins architecture
 We create two master Jenkins with the same configuration. One as the main-master and the other is master-backup  to serve as a failover for the Jenkins master. 
+
 We mount an Elastic File System (EFS) on both server pointing to the same directory. 
+
 We used Haproxy with port binding 80 to direct traffic to the backup server if the main master is down.
+
 For frequent updates of jobs run on the main master, we used the code below whose function is to reload and update the backup server.
 ```
 curl -s -XPOST 'http://localhost:8080/reload' -u admin:11b93da95c141b9395b7da9412b977a879 -H "$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)"
 
 ```
 We generate an API token from the backup server, then use `$(curl -s 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' -u admin:admin)` to generate jenkins crumb id from the backup server. The admin: admin signifies the username and password while `admin:11b93da95c141b9395b7da9412b977a879` signifies the username and API token respectively.
+We create and paste this code into this directory `/opt/jenkins_reload.sh` and run this command `sudo chmod +x /opt/jenkins_reload.sh`
+
 Also as part of resource management, we created a docker server to create jenkins-slaves to run Jenkins jobs. each container is killed once a job is completed.
 
 # Code Deployment
