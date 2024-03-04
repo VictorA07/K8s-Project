@@ -9,3 +9,5 @@ variable "iam-policy-arn" {}
 variable "ami-ec2" {}
 variable "ami-ubuntu" {}
 variable "efs-port" {}
+variable "profile" {}
+variable "region" {}
