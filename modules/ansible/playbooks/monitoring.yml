@@ -11,10 +11,10 @@
   tasks:
     - name: Download and unpack Helm
       shell: |
-        wget https://get.helm.sh/helm-v3.8.2-linux-amd64.tar.gz
-        tar -xvf helm-v3.8.2-linux-amd64.tar.gz
+        wget https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz
+        tar -xvf helm-v3.5.2-linux-amd64.tar.gz
         mv linux-amd64/helm /usr/local/bin/helm
-        rm -rvf helm-v3.8.2-linux-amd64.tar.gz
+        rm -rvf helm-v3.5.2-linux-amd64.tar.gz
 
     - name: Create namespace
       shell: sudo su -c "kubectl create namespace "{{ namespace }}"" ubuntu
