@@ -46,7 +46,7 @@ resource "aws_lb_listener" "stage-http" {
     redirect {
       port = "443"
       protocol = "HTTPS"
-      status_code = "HTTPS_301"
+      status_code = "HTTP_301"
     }
   }
 }
@@ -114,7 +114,7 @@ resource "aws_lb_listener" "prod-http" {
     redirect {
       port = "443"
       protocol = "HTTPS"
-      status_code = "HTTPS_301"
+      status_code = "HTTP_301"
     }
   }
 }

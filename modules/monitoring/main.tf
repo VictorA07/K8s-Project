@@ -49,7 +49,7 @@ resource "aws_lb_listener" "grafana-http" {
     redirect {
       port = "443"
       protocol = "HTTPS"
-      status_code = "HTTPS_301"
+      status_code = "HTTP_301"
     }
   }
 }
@@ -119,7 +119,7 @@ resource "aws_lb_listener" "prom-http" {
     redirect {
       port = "443"
       protocol = "HTTPS"
-      status_code = "HTTPS_301"
+      status_code = "HTTP_301"
     }
   }
 }
