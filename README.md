@@ -48,11 +48,11 @@ To deploythis code successfully, kindly follow the below instructions.
 # Section 1: Jenkins Deployment
 ## Step 1: Git repository cloning
 You can clone the repositoryusing the commmans below.
-`git clone https://github.com/VictorA07/K8s-Project.git` and navigate to the project directory
+```git clone https://github.com/VictorA07/K8s-Project.git``` and navigate to the project directory
 
 ## Step 2: Settings your credentials
 Create and update this **variable.tfvars** below.
-`
+```
 region =  "eu-west-2"
 profile = " "
 project-name =  " "
@@ -66,24 +66,24 @@ ami-ubuntu = " "
 efs-port = 2049
 ssh-port = 22
 jenkins-port = 8080
-`
+```
 # Step 3: Initialize Terraform and Deploying resources
 Run the command to initialize Terraform and deploy our jenkins resources.
 ### To initialize
-`terraform init -var-file=variable.tfvars -lock=false`
+```terraform init -var-file=variable.tfvars -lock=false```
 
 ### To plan the deployment
-`terraform plan -var-file=variable.tfvars -lock=false`
+```terraform plan -var-file=variable.tfvars -lock=false```
 
 ### To deploy
-`terraform apply -var-file=variable.tfvars -lock=false -auto-approve`
+```terraform apply -var-file=variable.tfvars -lock=false -auto-approve```
 
 ### To destroy
-`terraform destroy -var-file=variable.tfvars -lock=false -auto-approve`
+```terraform destroy -var-file=variable.tfvars -lock=false -auto-approve```
 
 Some of the resources out needed in our application infrastructure main.tf will be populated. This is performedby a null resource block added to the jenkins infrastructure main.tf file.
 
-`
+```
 resource "null_resource" "credentials" {
   depends_on = [aws_instance.jenkins-server-active]
   provisioner "local-exec" {
@@ -93,7 +93,7 @@ resource "null_resource" "credentials" {
     EOT 
   }
 }
-`
+```
 
 # Section 2: Infastructure and Application deployment using Jenkins.
 
@@ -115,8 +115,8 @@ Choices = apply, destroy
 choose github trigger
 Add your github repository link
 In your build, You can perform a terraform apply by chosing apply and terraform destroy by chosing destroy.
- You can use your domain name with specifiedprefix to access your application.
+You can use your domain name with specifiedprefix to access your application.
 
 
- Kinly reach out for more information and feedback.
- Thank you.
+Kinly reach out for more information and feedback. 
+Thank you.
