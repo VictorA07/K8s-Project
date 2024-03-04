@@ -24,4 +24,4 @@ default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 ma
     server master2 ${master2}:6443 check
     server master3 ${master3}:6443 check" > /etc/haproxy/haproxy.cfg'
 systemctl restart haproxy
-hostnamectl set-hostname ha-lb2
+hostnamectl set-hostname haproxy1

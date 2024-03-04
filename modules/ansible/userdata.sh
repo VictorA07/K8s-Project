@@ -38,11 +38,11 @@ sudo echo "${worker02} ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa" >>
 sudo echo "${worker03} ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa" >> /etc/ansible/hosts
 
 sudo su -c "ansible-playbook /home/ubuntu/playbooks/install.yml" ubuntu
-sudo su -c "ansible-playbook /home/ubuntu/playbooks/keepalived.yml" ubuntu
+sudo su -c "ansible-playbook /home/ubuntu/playbooks/ha-keepalived.yml" ubuntu
 sudo su -c "ansible-playbook /home/ubuntu/playbooks/main-master.yml" ubuntu
 sudo su -c "ansible-playbook /home/ubuntu/playbooks/member-master.yml" ubuntu
 sudo su -c "ansible-playbook /home/ubuntu/playbooks/worker.yml" ubuntu
-sudo su -c "ansible-playbook /home/ubuntu/playbooks/kubectl.yml" ubuntu
+sudo su -c "ansible-playbook /home/ubuntu/playbooks/ha-kubectl.yml" ubuntu
 sudo su -c "ansible-playbook /home/ubuntu/playbooks/stage.yml" ubuntu
 sudo su -c "ansible-playbook /home/ubuntu/playbooks/prod.yml" ubuntu
 sudo su -c "ansible-playbook /home/ubuntu/playbooks/monitoring.yml" ubuntu
